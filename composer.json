@@ -18,6 +18,7 @@
         }
     },
     "autoload-dev": {
+        "files": ["src/functions.php"],
         "psr-4": {
             "Bag2\\Meta\\": "tests/"
         }
