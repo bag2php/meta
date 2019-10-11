@@ -8,9 +8,8 @@
     colors="true"
     verbose="false">
   <testsuites>
-    <testsuite name="StormMeta">
+    <testsuite name="Bag2Meta">
       <directory>tests/</directory>
-      <exclude>tests/files/</exclude>
     </testsuite>
   </testsuites>
 </phpunit>
