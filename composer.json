@@ -1,0 +1,28 @@
+{
+    "name": "bag2/meta",
+    "description": "Library for meta programming.",
+    "license": "Apache-2.0",
+    "require": {
+        "php": "^7.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.15",
+        "phan/phan": "^2.2",
+        "phpstan/phpstan": "^0.11.16",
+        "phpunit/phpunit": "^7.5",
+        "vimeo/psalm": "^3.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bag2\\Meta\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Bag2\\Meta\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
