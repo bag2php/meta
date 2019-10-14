@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Bag2\Meta;
 
-use function Bag2\Meta\var_type;
+use Bag2\Meta\Func\ParameterCasterInterface;
 use Closure;
 use ReflectionFunction;
 use ReflectionFunctionAbstract;
 use ReflectionParameter;
-use TypeError;
 
 /**
  * Dynamic dispatching functions and methods
@@ -26,10 +25,17 @@ final class FunctionDispatcher
     /** @var ReflectionFunctionAbstract */
     private $ref;
 
-    public function __construct(callable $callback, ReflectionFunctionAbstract $ref)
-    {
+    /** @var ParameterCasterInterface */
+    private $param_caster;
+
+    public function __construct(
+        callable $callback,
+        ReflectionFunctionAbstract $ref,
+        ParameterCasterInterface $param_caster = null
+    ) {
         $this->callback = $callback;
         $this->ref = $ref;
+        $this->param_caster = $param_caster ?? new Func\DefaultCaster;
     }
 
     public static function fromCallable(callable $callback): self
@@ -50,7 +56,7 @@ final class FunctionDispatcher
     public function dispatch(array $values)
     {
         $params = $this->ref->getParameters();
-        $args = self::_buildArgs($params, $values);
+        $args = $this->buildArgs($params, $values);
 
         return ($this->callback)(...$args);
     }
@@ -59,7 +65,7 @@ final class FunctionDispatcher
      * @param array<int,ReflectionParameter> $params
      * @params array<string,mixed> $values
      */
-    private static function _buildArgs(array $params, array $values): array
+    private function buildArgs(array $params, array $values): array
     {
         $args = [];
 
@@ -73,49 +79,10 @@ final class FunctionDispatcher
                 throw new \LogicException('Given values do not match parameters of function definition');
             }
 
-            $args[] = self::_castArg($n + 1, $param, $values[$name]);
+            $args[] = $this->param_caster->cast($n + 1, $param, $values[$name]);
         }
 
         return $args;
-    }
-
-    /**
-     * Cast $value by parameter of callback
-     *
-     * @param int $n
-     * @param ReflectionParameter $param
-     * @param mixed $value
-     * @return mixed
-     */
-    private static function _castArg(int $n, ReflectionParameter $param, $value)
-    {
-        if (!$param->hasType()) {
-            return $value;
-        }
-
-        $type = (string)$param->getType();
-
-        if ($type === 'int') {
-            if (!(\is_string($value) && \ctype_digit($value))) {
-                $given_type = var_type($value);
-                throw new TypeError("Argument {$n} passed to FunctionDispatcher must be of the type int, {$given_type} given");
-            }
-
-            return (int)$value;
-        }
-
-        if ($type === 'string') {
-            if (!\is_string($value)
-                && !(\is_object($value) && \method_exists($value, '__toString'))
-            ) {
-                $given_type = var_type($value);
-                throw new TypeError("Argument {$n} passed to FunctionDispatcher must be of the type string, {$given_type} given");
-            }
-
-            return (string)$value;
-        }
-
-        throw new \LogicException('Unexpected value');
     }
 
     /**
