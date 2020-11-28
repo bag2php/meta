@@ -3,14 +3,10 @@
     "description": "Library for meta programming.",
     "license": "Apache-2.0",
     "require": {
-        "php": "^7.0"
+        "php": "^7.0 || ^8.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.15",
-        "phan/phan": "^2.2",
-        "phpstan/phpstan": "^0.11.16",
-        "phpunit/phpunit": "^7.5",
-        "vimeo/psalm": "^3.6"
+        "phpunit/phpunit": "^7.5 || ^9.4"
     },
     "autoload": {
         "psr-4": {
